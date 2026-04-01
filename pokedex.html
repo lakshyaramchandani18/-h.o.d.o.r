@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pokédex</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<!-- <link rel="stylesheet" href="style.css"> -->
+</head>
+<body>
+
+<!-- POKÉDEX DEVICE -->
+<div class="pokedex-device">
+  <div class="dex-top">
+    <div class="dex-top-bar">
+      <div class="dex-camera"></div>
+      <div class="dex-leds">
+        <div class="led led-red"></div>
+        <div class="led led-yellow"></div>
+        <div class="led led-green"></div>
+      </div>
+    </div>
+    <div class="dex-screen-wrapper">
+      <div class="dex-screen">
+        <div class="screen-header">
+          <span class="screen-header-text">POKÉDEX</span>
+          <span class="screen-header-text" id="device-num">#001</span>
+        </div>
+        <div class="screen-content">
+          <div class="device-pokemon-display" id="device-display">
+            <div class="loading" style="padding: 16px">
+              <div class="pokeball-loader" style="width:24px;height:24px;border-width:3px"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="dex-hinge"></div>
+
+  <div class="dex-bottom">
+    <div class="dex-controls">
+      <div class="dex-dpad">
+        <div class="dpad-h"></div>
+        <div class="dpad-v"></div>
+        <div class="dpad-center"></div>
+      </div>
+      <div class="dex-small-screen-wrapper">
+        <div class="dex-small-screen" id="small-screen">
+          <div class="small-screen-label">STATUS</div>
+          <div class="small-screen-val" id="ss-height">HT: ---</div>
+          <div class="small-screen-val" id="ss-weight">WT: ---</div>
+          <div class="small-screen-val" id="ss-base">BST: ---</div>
+          <div class="small-screen-val" id="ss-catch">CATCH: ---</div>
+        </div>
+      </div>
+    </div>
+    <div class="dex-buttons">
+      <div class="dex-speaker">
+        <div class="speaker-dot"></div>
+        <div class="speaker-dot"></div>
+        <div class="speaker-dot"></div>
+        <div class="speaker-dot"></div>
+      </div>
+      <div class="btn-b"></div>
+      <div class="btn-a">A</div>
+    </div>
+  </div>
+</div>
+
+<!-- DATABASE PANEL -->
+<div class="database-panel">
+  <div class="db-header">
+    <div>
+      <div class="db-title">POKÉDEX</div>
+      <div class="db-subtitle">NATIONAL POKÉMON DATABASE // PROF. OAK SYSTEM v2.0</div>
+    </div>
+  </div>
+
+  <div class="search-bar">
+    <input class="search-input" type="text" id="search-input" placeholder="Search by name or number..." autocomplete="off">
+    <select class="filter-select" id="type-filter">
+      <option value="">All Types</option>
+      <option value="normal">Normal</option>
+      <option value="fire">Fire</option>
+      <option value="water">Water</option>
+      <option value="electric">Electric</option>
+      <option value="grass">Grass</option>
+      <option value="ice">Ice</option>
+      <option value="fighting">Fighting</option>
+      <option value="poison">Poison</option>
+      <option value="ground">Ground</option>
+      <option value="flying">Flying</option>
+      <option value="psychic">Psychic</option>
+      <option value="bug">Bug</option>
+      <option value="rock">Rock</option>
+      <option value="ghost">Ghost</option>
+      <option value="dragon">Dragon</option>
+      <option value="dark">Dark</option>
+      <option value="steel">Steel</option>
+      <option value="fairy">Fairy</option>
+    </select>
+  </div>
+
+  <div class="gen-tabs" id="gen-tabs">
+    <div class="gen-tab active" data-gen="0">ALL</div>
+    <div class="gen-tab" data-gen="1">GEN I</div>
+    <div class="gen-tab" data-gen="2">GEN II</div>
+    <div class="gen-tab" data-gen="3">GEN III</div>
+    <div class="gen-tab" data-gen="4">GEN IV</div>
+    <div class="gen-tab" data-gen="5">GEN V</div>
+    <div class="gen-tab" data-gen="6">GEN VI</div>
+    <div class="gen-tab" data-gen="7">GEN VII</div>
+    <div class="gen-tab" data-gen="8">GEN VIII</div>
+    <div class="gen-tab" data-gen="9">GEN IX</div>
+  </div>
+
+  <div class="db-stats">
+    <div class="stat-chip">
+      <div class="stat-chip-num" id="total-count">---</div>
+      <div class="stat-chip-label">POKÉMON</div>
+    </div>
+    <div class="stat-chip">
+      <div class="stat-chip-num" id="showing-count">---</div>
+      <div class="stat-chip-label">SHOWING</div>
+    </div>
+  </div>
+
+  <div id="grid-container">
+    <div class="loading">
+      <div class="pokeball-loader"></div>
+      LOADING DATABASE...
+    </div>
+  </div>
+
+  <div class="pagination" id="pagination" style="display:none">
+    <button class="page-btn" id="prev-btn">◄ PREV</button>
+    <span class="page-info" id="page-info">Page 1</span>
+    <button class="page-btn" id="next-btn">NEXT ►</button>
+  </div>
+
+  <div class="detail-panel" id="detail-panel"></div>
+</div>
+
+<script>
+const TYPE_COLORS = {
+  normal:'#A8A878',fire:'#F08030',water:'#6890F0',electric:'#F8D030',
+  grass:'#78C850',ice:'#98D8D8',fighting:'#C03028',poison:'#A040A0',
+  ground:'#E0C068',flying:'#A890F0',psychic:'#F85888',bug:'#A8B820',
+  rock:'#B8A038',ghost:'#705898',dragon:'#7038F8',dark:'#705848',
+  steel:'#B8B8D0',fairy:'#EE99AC'
+};
+
+const STAT_COLORS = {
+  hp:'#FF5959',attack:'#F5AC78',defense:'#FAE078','special-attack':'#9DB7F5',
+  'special-defense':'#A7DB8D',speed:'#FA92B2'
+};
+
+const GEN_RANGES = {
+  0:[1,1025],1:[1,151],2:[152,251],3:[252,386],
+  4:[387,493],5:[494,649],6:[650,721],
+  7:[722,809],8:[810,905],9:[906,1025]
+};
+
+let allPokemon = [];
+let filtered = [];
+let selectedGen = 0;
+let currentPage = 1;
+const PAGE_SIZE = 30;
+let selectedId = null;
+let cache = {};
+
+async function apiFetch(url) {
+  if (cache[url]) return cache[url];
+  const r = await fetch(url);
+  const d = await r.json();
+  cache[url] = d;
+  return d;
+}
+
+async function loadPokemonList() {
+  const data = await apiFetch('https://pokeapi.co/api/v2/pokemon?limit=1025&offset=0');
+  allPokemon = data.results.map((p, i) => ({
+    id: i + 1,
+    name: p.name,
+    url: p.url
+  }));
+  document.getElementById('total-count').textContent = allPokemon.length;
+  applyFilters();
+}
+
+function applyFilters() {
+  const q = document.getElementById('search-input').value.toLowerCase().trim();
+  const type = document.getElementById('type-filter').value;
+  const [genMin, genMax] = GEN_RANGES[selectedGen];
+
+  filtered = allPokemon.filter(p => {
+    const inGen = p.id >= genMin && p.id <= genMax;
+    const matchQ = !q || p.name.includes(q) || String(p.id).includes(q);
+    return inGen && matchQ;
+  });
+
+  // type filter requires fetching data, handle separately
+  if (type) {
+    renderTypeFiltered(type);
+  } else {
+    document.getElementById('showing-count').textContent = filtered.length;
+    currentPage = 1;
+    renderGrid();
+  }
+}
+
+async function renderTypeFiltered(type) {
+  const container = document.getElementById('grid-container');
+  container.innerHTML = '<div class="loading"><div class="pokeball-loader"></div>FILTERING...</div>';
+  try {
+    const data = await apiFetch(`https://pokeapi.co/api/v2/type/${type}`);
+    const typeIds = new Set(data.pokemon.map(p => {
+      const parts = p.pokemon.url.split('/').filter(Boolean);
+      return parseInt(parts[parts.length - 1]);
+    }));
+    filtered = filtered.filter(p => typeIds.has(p.id));
+    document.getElementById('showing-count').textContent = filtered.length;
+    currentPage = 1;
+    renderGrid();
+  } catch {
+    container.innerHTML = '<div class="empty-state">ERROR FETCHING TYPE DATA</div>';
+  }
+}
+
+function getCurrentPageItems() {
+  const start = (currentPage - 1) * PAGE_SIZE;
+  return filtered.slice(start, start + PAGE_SIZE);
+}
+
+function renderGrid() {
+  const container = document.getElementById('grid-container');
+  const items = getCurrentPageItems();
+
+  if (items.length === 0) {
+    container.innerHTML = '<div class="empty-state">NO POKÉMON FOUND<br><br>TRY A DIFFERENT SEARCH</div>';
+    document.getElementById('pagination').style.display = 'none';
+    return;
+  }
+
+  const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
+  document.getElementById('pagination').style.display = totalPages > 1 ? 'flex' : 'none';
+  document.getElementById('page-info').textContent = `Page ${currentPage} / ${totalPages}`;
+  document.getElementById('prev-btn').disabled = currentPage <= 1;
+  document.getElementById('next-btn').disabled = currentPage >= totalPages;
+
+  container.innerHTML = `<div class="pokemon-grid" id="pokemon-grid"></div>`;
+  const grid = document.getElementById('pokemon-grid');
+
+  items.forEach((p, idx) => {
+    const card = document.createElement('div');
+    card.className = 'pokemon-card' + (p.id === selectedId ? ' selected' : '');
+    card.dataset.id = p.id;
+    card.innerHTML = `
+      <div class="card-num">#${String(p.id).padStart(4,'0')}</div>
+      <img class="card-sprite" 
+        src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${p.id}.png" 
+        alt="${p.name}"
+        loading="lazy"
+        onerror="this.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/0.png'">
+      <div class="card-name">${p.name}</div>
+      <div class="card-types" id="types-${p.id}"><span class="type-badge" style="background:#555">···</span></div>
+    `;
+    card.addEventListener('click', () => selectPokemon(p.id));
+    grid.appendChild(card);
+
+    // Load types async
+    loadCardTypes(p.id);
+  });
+}
+
+async function loadCardTypes(id) {
+  try {
+    const data = await apiFetch(`https://pokeapi.co/api/v2/pokemon/${id}`);
+    const container = document.getElementById(`types-${id}`);
+    if (!container) return;
+    container.innerHTML = data.types.map(t => 
+      `<span class="type-badge type-${t.type.name}">${t.type.name}</span>`
+    ).join('');
+    // Update card color
+    const card = document.querySelector(`[data-id="${id}"]`);
+    if (card) {
+      const tc = TYPE_COLORS[data.types[0].type.name] || '#666';
+      card.style.setProperty('--card-color', tc + '22');
+      card.style.setProperty('--card-border', tc + '66');
+      card.style.setProperty('--card-glow', tc + '33');
+    }
+  } catch {}
+}
+
+async function selectPokemon(id) {
+  selectedId = id;
+  document.querySelectorAll('.pokemon-card').forEach(c => {
+    c.classList.toggle('selected', parseInt(c.dataset.id) === id);
+  });
+  updateDevice(id);
+  await loadDetail(id);
+}
+
+async function updateDevice(id) {
+  document.getElementById('device-num').textContent = `#${String(id).padStart(3,'0')}`;
+  const display = document.getElementById('device-display');
+  display.innerHTML = `<div class="loading" style="padding:16px"><div class="pokeball-loader" style="width:24px;height:24px;border-width:3px"></div></div>`;
+  
+  try {
+    const data = await apiFetch(`https://pokeapi.co/api/v2/pokemon/${id}`);
+    const types = data.types.map(t => t.type.name);
+    display.innerHTML = `
+      <img class="device-pokemon-sprite" 
+        src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png" 
+        alt="${data.name}">
+      <div class="device-pokemon-name">${data.name}</div>
+      <div class="device-pokemon-num">#${String(id).padStart(3,'0')}</div>
+      <div class="device-types">
+        ${types.map(t => `<span class="device-type-badge type-${t}">${t}</span>`).join('')}
+      </div>
+    `;
+    const h = data.height / 10;
+    const w = data.weight / 10;
+    const bst = data.stats.reduce((s, st) => s + st.base_stat, 0);
+    document.getElementById('ss-height').textContent = `HT: ${h}m`;
+    document.getElementById('ss-weight').textContent = `WT: ${w}kg`;
+    document.getElementById('ss-base').textContent = `BST: ${bst}`;
+    document.getElementById('ss-catch').textContent = `HP: ${data.stats[0].base_stat}`;
+  } catch {}
+}
+
+async function loadDetail(id) {
+  const panel = document.getElementById('detail-panel');
+  panel.className = 'detail-panel visible';
+  panel.innerHTML = '<div class="loading"><div class="pokeball-loader"></div>LOADING DATA...</div>';
+  panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+  try {
+    const [poke, species] = await Promise.all([
+      apiFetch(`https://pokeapi.co/api/v2/pokemon/${id}`),
+      apiFetch(`https://pokeapi.co/api/v2/pokemon-species/${id}`)
+    ]);
+
+    const types = poke.types.map(t => t.type.name);
+    const mainColor = TYPE_COLORS[types[0]] || '#666';
+    const bst = poke.stats.reduce((s, st) => s + st.base_stat, 0);
+    
+    const desc = (species.flavor_text_entries.find(e => e.language.name === 'en') || {flavor_text:''}).flavor_text.replace(/\f/g,' ').replace(/\n/g,' ');
+    const genus = (species.genera.find(g => g.language.name === 'en') || {genus: ''}).genus;
+    
+    // Evolution chain
+    let evoHtml = '';
+    try {
+      const evoData = await apiFetch(species.evolution_chain.url);
+      const evoItems = [];
+      let chain = evoData.chain;
+      while (chain) {
+        const evoId = chain.species.url.split('/').filter(Boolean).pop();
+        evoItems.push({ name: chain.species.name, id: evoId });
+        chain = chain.evolves_to[0] || null;
+      }
+      if (evoItems.length > 1) {
+        evoHtml = `
+          <div class="section-label">EVOLUTION CHAIN</div>
+          <div class="evolutions-row">
+            ${evoItems.map((e, i) => `
+              ${i > 0 ? '<div class="evo-arrow">›</div>' : ''}
+              <div class="evo-item" onclick="selectPokemon(${e.id})">
+                <img class="evo-sprite" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${e.id}.png" alt="${e.name}">
+                <div class="evo-name">${e.name}</div>
+              </div>
+            `).join('')}
+          </div>
+        `;
+      }
+    } catch {}
+
+    const abilities = poke.abilities.map(a => 
+      `<span class="ability-chip ${a.is_hidden ? 'hidden' : ''}">${a.ability.name.replace('-',' ')}${a.is_hidden ? ' ★' : ''}</span>`
+    ).join('');
+
+    const stats = poke.stats.map(s => {
+      const color = STAT_COLORS[s.stat.name] || '#888';
+      const pct = Math.min(100, (s.base_stat / 255) * 100);
+      const names = { hp:'HP', attack:'ATK', defense:'DEF', 'special-attack':'Sp.ATK', 'special-defense':'Sp.DEF', speed:'SPD' };
+      return `
+        <div class="stat-row">
+          <div class="stat-name">${names[s.stat.name] || s.stat.name}</div>
+          <div class="stat-num">${s.base_stat}</div>
+          <div class="stat-bar-wrap">
+            <div class="stat-bar-fill" style="background:${color};width:${pct}%"></div>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    const shinyUrl = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/${id}.png`;
+    const officialUrl = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${id}.png`;
+
+    panel.innerHTML = `
+      <div class="detail-top">
+        <div class="detail-sprite-wrap" style="--type-color: ${mainColor}44">
+          <img class="detail-sprite" id="main-sprite"
+            src="${officialUrl}"
+            onerror="this.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png'"
+            alt="${poke.name}">
+        </div>
+        <div class="detail-info">
+          <div class="detail-num">#${String(id).padStart(4,'0')} · ${species.generation.name.replace('-',' ').toUpperCase()}</div>
+          <div class="detail-name">${poke.name}</div>
+          <div class="detail-genus">${genus}</div>
+          <div class="detail-types">
+            ${types.map(t => `<span class="type-badge type-${t}" style="font-size:12px;padding:4px 14px">${t}</span>`).join('')}
+          </div>
+          <div class="detail-meta">
+            <div class="meta-item">
+              <div class="meta-label">HEIGHT</div>
+              <div class="meta-val">${poke.height/10}m</div>
+            </div>
+            <div class="meta-item">
+              <div class="meta-label">WEIGHT</div>
+              <div class="meta-val">${poke.weight/10}kg</div>
+            </div>
+            <div class="meta-item">
+              <div class="meta-label">BASE EXP</div>
+              <div class="meta-val">${poke.base_experience || '—'}</div>
+            </div>
+            <div class="meta-item">
+              <div class="meta-label">CAPTURE</div>
+              <div class="meta-val">${species.capture_rate}</div>
+            </div>
+            <div class="meta-item">
+              <div class="meta-label">HAPPINESS</div>
+              <div class="meta-val">${species.base_happiness ?? '—'}</div>
+            </div>
+            <div class="meta-item">
+              <div class="meta-label">BST</div>
+              <div class="meta-val" style="color:${mainColor}">${bst}</div>
+            </div>
+          </div>
+          <div class="section-label">ABILITIES</div>
+          <div class="abilities-wrap">${abilities}</div>
+        </div>
+      </div>
+
+      <div class="detail-desc">${desc}</div>
+
+      <div class="stats-section" style="margin-top:20px">
+        <div class="stats-title">BASE STATS</div>
+        ${stats}
+      </div>
+
+      ${evoHtml}
+    `;
+
+    // Animate bars
+    setTimeout(() => {
+      document.querySelectorAll('.stat-bar-fill').forEach(bar => {
+        bar.style.width = bar.style.width;
+      });
+    }, 100);
+
+  } catch(e) {
+    panel.innerHTML = '<div class="empty-state">ERROR LOADING POKÉMON DATA</div>';
+  }
+}
+
+// Events
+document.getElementById('search-input').addEventListener('input', debounce(applyFilters, 300));
+document.getElementById('type-filter').addEventListener('change', applyFilters);
+
+document.getElementById('gen-tabs').addEventListener('click', e => {
+  const tab = e.target.closest('.gen-tab');
+  if (!tab) return;
+  document.querySelectorAll('.gen-tab').forEach(t => t.classList.remove('active'));
+  tab.classList.add('active');
+  selectedGen = parseInt(tab.dataset.gen);
+  applyFilters();
+});
+
+document.getElementById('prev-btn').addEventListener('click', () => {
+  if (currentPage > 1) { currentPage--; renderGrid(); window.scrollTo(0, 0); }
+});
+document.getElementById('next-btn').addEventListener('click', () => {
+  const total = Math.ceil(filtered.length / PAGE_SIZE);
+  if (currentPage < total) { currentPage++; renderGrid(); window.scrollTo(0, 0); }
+});
+
+function debounce(fn, ms) {
+  let t;
+  return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); };
+}
+
+loadPokemonList().then(() => {
+  // Auto-select Bulbasaur on load
+  selectPokemon(1);
+});
+</script>
+</body>
+</html>
