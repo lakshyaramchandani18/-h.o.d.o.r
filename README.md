@@ -112,8 +112,8 @@ Keeps the application dynamic and up-to-date.
 ##  Tech Stack
 
 
-|-------|------------|
-| Frontend | HTML, CSS, JavaScript |
+
+ HTML, CSS, JavaScript ,React
 
 
 ---
